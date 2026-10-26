@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7f4">
+    <meta name="description" content="Explorador interactivo de una estructura de archivos modelada con un árbol n-ario.">
+    <title>Árbol — Administrador de archivos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegación del sistema de archivos">
+        <a class="brand" href="/" aria-label="Árbol, inicio">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" fill="none"><path d="M20 9v8m0 0H11v7m9-7h9v7M11 24v7m9-7v7m9-7v7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="20" cy="8" r="3" fill="currentColor"/><circle cx="11" cy="24" r="3" fill="currentColor"/><circle cx="29" cy="24" r="3" fill="currentColor"/><circle cx="11" cy="32" r="2.5" fill="currentColor"/><circle cx="20" cy="32" r="2.5" fill="currentColor"/><circle cx="29" cy="32" r="2.5" fill="currentColor"/></svg>
+          </span>
+          <span class="brand-copy"><strong>árbol</strong><small>FILE SYSTEM</small></span>
+        </a>
+
+        <div class="sidebar-section-heading">
+          <span>EXPLORADOR</span>
+          <button class="icon-button small" id="refresh-button" type="button" aria-label="Actualizar árbol" title="Actualizar">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 8a6.4 6.4 0 0 0-11.7-2L3 8m0 0V4.5M3 8h3.5m-2.7 4a6.4 6.4 0 0 0 11.7 2l1.5-2m0 0v3.5m0-3.5h-3.5"/></svg>
+          </button>
+        </div>
+        <nav id="tree-navigation" class="tree-navigation" aria-label="Árbol de carpetas">
+          <div class="loading-tree"><span class="spinner"></span> Cargando estructura…</div>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="tree-note-icon" aria-hidden="true">✳</div>
+          <p><strong>Un árbol, muchas rutas.</strong><br>Explora cómo se organiza cada elemento.</p>
+          <span class="model-chip"><span></span> ÁRBOL N-ARIO</span>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div class="topbar-context"><span class="status-dot"></span> ESPACIO DE TRABAJO <span class="context-divider">/</span> <span>ARCHIVOS LOCALES</span></div>
+          <div class="topbar-actions">
+            <span class="demo-badge"><span></span> ENTORNO DE DEMOSTRACIÓN</span>
+            <button class="avatar" type="button" aria-label="Perfil de usuario">A</button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="welcome-row">
+            <div>
+              <div class="eyebrow"><span class="eyebrow-line"></span> TU ESTRUCTURA, DE UN VISTAZO</div>
+              <h1>Administrador de archivos<span class="title-period">.</span></h1>
+              <p class="intro-copy">Navega la jerarquía, revisa tamaños y organiza tus directorios.</p>
+            </div>
+            <button class="button button-primary" id="new-folder-button" type="button">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+              Nuevo elemento
+            </button>
+          </section>
+
+          <section class="overview-grid" aria-label="Resumen del almacenamiento">
+            <article class="storage-card">
+              <div class="storage-content">
+                <div class="card-kicker"><span class="storage-glyph">◒</span> ALMACENAMIENTO EN EL ÁRBOL</div>
+                <div class="storage-total" id="total-storage">—</div>
+                <div class="storage-caption">Suma del tamaño de todos los archivos</div>
+                <div class="storage-track" aria-label="Distribución del almacenamiento">
+                  <span class="storage-segment segment-documents" id="segment-documents"></span>
+                  <span class="storage-segment segment-projects" id="segment-projects"></span>
+                  <span class="storage-segment segment-downloads" id="segment-downloads"></span>
+                  <span class="storage-segment segment-other" id="segment-other"></span>
+                </div>
+                <div class="storage-legend">
+                  <span><i class="legend-dot documents-dot"></i> Documentos</span>
+                  <span><i class="legend-dot projects-dot"></i> Proyectos</span>
+                  <span><i class="legend-dot downloads-dot"></i> Descargas</span>
+                  <span><i class="legend-dot other-dot"></i> Otros</span>
+                </div>
+              </div>
+              <div class="storage-orbit" aria-hidden="true"><div class="orbit-inner"><span>Σ</span></div></div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-topline"><span class="metric-icon folder-icon">▰</span><span class="metric-label">DIRECTORIOS</span></div>
+              <div class="metric-value" id="directory-count">—</div>
+              <div class="metric-foot"><span class="metric-dash"></span> Carpetas en la jerarquía</div>
+            </article>
+            <article class="metric-card">
+              <div class="metric-topline"><span class="metric-icon file-icon">▤</span><span class="metric-label">ARCHIVOS</span></div>
+              <div class="metric-value" id="file-count">—</div>
+              <div class="metric-foot"><span class="metric-dash"></span> Elementos hoja con contenido</div>
+            </article>
+          </section>
+
+          <section class="explorer-card" aria-labelledby="explorer-title">
+            <div class="explorer-heading">
+              <div>
+                <div class="section-kicker">VISTA DEL SISTEMA</div>
+                <h2 id="explorer-title">Explorador</h2>
+              </div>
+              <label class="search-box">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.7" cy="8.7" r="5.7"/><path d="m13 13 4 4"/></svg>
+                <input id="search-input" type="search" placeholder="Buscar nombre o ruta…" autocomplete="off" aria-label="Buscar archivos y carpetas">
+                <kbd>⌘ K</kbd>
+                <div class="search-results" id="search-results" hidden></div>
+              </label>
+            </div>
+            <div class="path-row">
+              <nav id="breadcrumbs" class="breadcrumbs" aria-label="Ruta actual"></nav>
+              <div class="view-actions">
+                <button class="button button-quiet" id="new-file-button" type="button"><span class="plus-small">+</span> Archivo</button>
+                <button class="icon-button" id="view-refresh-button" type="button" title="Actualizar" aria-label="Actualizar contenido">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 8a6.4 6.4 0 0 0-11.7-2L3 8m0 0V4.5M3 8h3.5m-2.7 4a6.4 6.4 0 0 0 11.7 2l1.5-2m0 0v3.5m0-3.5h-3.5"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table class="file-table">
+                <thead><tr><th scope="col">NOMBRE</th><th scope="col">TIPO</th><th scope="col">TAMAÑO</th><th scope="col" class="row-actions-heading">ACCIONES</th></tr></thead>
+                <tbody id="file-list"><tr><td colspan="4" class="empty-loading"><span class="spinner"></span> Cargando elementos…</td></tr></tbody>
+              </table>
+            </div>
+            <div class="explorer-footer"><span id="entry-count">Conectando con el árbol…</span><span class="footer-tree-tag"><span></span> NAVEGACIÓN JERÁRQUICA</span></div>
+          </section>
+
+          <footer class="page-footer"><span>MODELO DE ESTRUCTURAS DE DATOS</span><span>Árbol general <b>·</b> Exploración preorden <b>·</b> Tamaño postorden</span></footer>
+        </div>
+      </main>
+    </div>
+
+    <dialog class="create-dialog" id="create-dialog" aria-labelledby="dialog-title">
+      <form id="create-form" novalidate>
+        <div class="dialog-topline"><span class="dialog-symbol">＋</span><button class="icon-button" id="close-dialog-button" type="button" aria-label="Cerrar">×</button></div>
+        <div class="section-kicker">AMPLIAR EL ÁRBOL</div>
+        <h2 id="dialog-title">Crear un elemento</h2>
+        <p class="dialog-copy">Se añadirá como hijo del directorio seleccionado.</p>
+        <label class="field-label" for="parent-path">Directorio padre</label>
+        <div class="path-field"><span>↳</span><input id="parent-path" name="parent_path" readonly></div>
+        <label class="field-label" for="entry-name">Nombre</label>
+        <input class="text-field" id="entry-name" name="name" placeholder="Por ejemplo, recursos" required maxlength="80">
+        <fieldset class="kind-picker">
+          <legend class="field-label">Tipo de elemento</legend>
+          <label class="kind-option selected" data-kind="directory"><input type="radio" name="kind" value="directory" checked><span class="kind-icon">▰</span><span><strong>Carpeta</strong><small>Puede contener elementos</small></span><i class="radio-indicator"></i></label>
+          <label class="kind-option" data-kind="file"><input type="radio" name="kind" value="file"><span class="kind-icon file-kind-icon">▤</span><span><strong>Archivo</strong><small>Define un tamaño en bytes</small></span><i class="radio-indicator"></i></label>
+        </fieldset>
+        <div class="size-fields" id="size-fields" hidden>
+          <label class="field-label" for="file-size">Tamaño del archivo</label>
+          <div class="size-input-row"><input class="text-field" id="file-size" type="number" min="0" step="any" value="1"><select id="size-unit" aria-label="Unidad de tamaño"><option value="1">bytes</option><option value="1024" selected>KiB</option><option value="1048576">MiB</option></select></div>
+        </div>
+        <p class="form-message" id="form-message" role="alert"></p>
+        <div class="dialog-actions"><button class="button button-quiet" id="cancel-dialog-button" type="button">Cancelar</button><button class="button button-primary" id="submit-create-button" type="submit">Crear elemento <span>↗</span></button></div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
